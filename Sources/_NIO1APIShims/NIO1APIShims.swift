@@ -56,269 +56,273 @@ extension StaticString: Collection {
     public typealias _Index = Int
 
     @available(*, deprecated, message: "don't use the StaticString: Collection extension please")
-    public var startIndex: _Index { return 0 }
+    public var startIndex: _Index { 0 }
     @available(*, deprecated, message: "don't use the StaticString: Collection extension please")
-    public var endIndex: _Index { return self.utf8CodeUnitCount }
+    public var endIndex: _Index { utf8CodeUnitCount }
     @available(*, deprecated, message: "don't use the StaticString: Collection extension please")
-    public func index(after i: _Index) -> _Index { return i + 1 }
+    public func index(after i: _Index) -> _Index { i + 1 }
 
     @available(*, deprecated, message: "don't use the StaticString: Collection extension please")
     public subscript(position: Int) -> UInt8 {
-        precondition(position < self.utf8CodeUnitCount, "index \(position) out of bounds")
-        return self.utf8Start.advanced(by: position).pointee
+        precondition(position < utf8CodeUnitCount, "index \(position) out of bounds")
+        return utf8Start.advanced(by: position).pointee
     }
 }
 
-extension ChannelPipeline {
+public extension ChannelPipeline {
     @available(*, deprecated, message: "please use addHandler(ByteToMessageHandler(myByteToMessageDecoder))")
-    public func add<Decoder: ByteToMessageDecoder>(handler decoder: Decoder) -> EventLoopFuture<Void> {
-        return self.addHandler(ByteToMessageHandler(decoder))
+    func add<Decoder: ByteToMessageDecoder>(handler decoder: Decoder) -> EventLoopFuture<Void> {
+        addHandler(ByteToMessageHandler(decoder))
     }
 
     @available(*, deprecated, message: "please use addHandler(MessageToByteHandler(myMessageToByteEncoder))")
-    public func add<Encoder: MessageToByteEncoder>(handler encoder: Encoder) -> EventLoopFuture<Void> {
-        return self.addHandler(MessageToByteHandler(encoder))
+    func add<Encoder: MessageToByteEncoder>(handler encoder: Encoder) -> EventLoopFuture<Void> {
+        addHandler(MessageToByteHandler(encoder))
     }
 
     @available(*, deprecated, renamed: "addHandler(_:position:)")
-    public func add(handler: ChannelHandler, first: Bool = false) -> EventLoopFuture<Void> {
-        return self.addHandler(handler, position: first ? .first : .last)
+    func add(handler: ChannelHandler, first: Bool = false) -> EventLoopFuture<Void> {
+        addHandler(handler, position: first ? .first : .last)
     }
 
     @available(*, deprecated, renamed: "addHandler(_:name:position:)")
-    public func add(name: String, handler: ChannelHandler, first: Bool = false) -> EventLoopFuture<Void> {
-        return self.addHandler(handler, name: name, position: first ? .first : .last)
+    func add(name: String, handler: ChannelHandler, first: Bool = false) -> EventLoopFuture<Void> {
+        addHandler(handler, name: name, position: first ? .first : .last)
     }
 
     @available(*, deprecated, renamed: "addHandler(_:name:position:)")
-    public func add(name: String? = nil, handler: ChannelHandler, after: ChannelHandler) -> EventLoopFuture<Void> {
-        return self.addHandler(handler, name: name, position: .after(after))
+    func add(name: String? = nil, handler: ChannelHandler, after: ChannelHandler) -> EventLoopFuture<Void> {
+        addHandler(handler, name: name, position: .after(after))
     }
 
     @available(*, deprecated, renamed: "addHandler(_:name:position:)")
-    public func add(name: String? = nil, handler: ChannelHandler, before: ChannelHandler) -> EventLoopFuture<Void> {
-        return self.addHandler(handler, name: name, position: .before(before))
+    func add(name: String? = nil, handler: ChannelHandler, before: ChannelHandler) -> EventLoopFuture<Void> {
+        addHandler(handler, name: name, position: .before(before))
     }
 
     @available(*, deprecated, renamed: "removeHandler(_:)")
-    public func remove(handler: RemovableChannelHandler) -> EventLoopFuture<Void> {
-        return self.removeHandler(handler)
+    func remove(handler: RemovableChannelHandler) -> EventLoopFuture<Void> {
+        removeHandler(handler)
     }
 
     @available(*, deprecated, renamed: "removeHandler(name:)")
-    public func remove(name: String) -> EventLoopFuture<Void> {
-        return self.removeHandler(name: name)
+    func remove(name: String) -> EventLoopFuture<Void> {
+        removeHandler(name: name)
     }
 
     @available(*, deprecated, renamed: "removeHandler(context:)")
-    public func remove(context: ChannelHandlerContext) -> EventLoopFuture<Void> {
-        return self.removeHandler(context: context)
+    func remove(context: ChannelHandlerContext) -> EventLoopFuture<Void> {
+        removeHandler(context: context)
     }
 
     @available(*, deprecated, renamed: "removeHandler(_:promise:)")
-    public func remove(handler: RemovableChannelHandler, promise: EventLoopPromise<Void>?) {
-        return self.removeHandler(handler, promise: promise)
+    func remove(handler: RemovableChannelHandler, promise: EventLoopPromise<Void>?) {
+        removeHandler(handler, promise: promise)
     }
 
     @available(*, deprecated, renamed: "removeHandler(name:promise:)")
-    public func remove(name: String, promise: EventLoopPromise<Void>?) {
-        return self.removeHandler(name: name, promise: promise)
+    func remove(name: String, promise: EventLoopPromise<Void>?) {
+        removeHandler(name: name, promise: promise)
     }
 
     @available(*, deprecated, renamed: "removeHandler(context:promise:)")
-    public func remove(context: ChannelHandlerContext, promise: EventLoopPromise<Void>?) {
-        return self.removeHandler(context: context, promise: promise)
+    func remove(context: ChannelHandlerContext, promise: EventLoopPromise<Void>?) {
+        removeHandler(context: context, promise: promise)
     }
 }
 
-extension EventLoop {
+public extension EventLoop {
     @available(*, deprecated, renamed: "makePromise")
-    public func newPromise<T>(of type: T.Type = T.self, file: StaticString = #file, line: UInt = #line) -> EventLoopPromise<T> {
-        return self.makePromise(of: type, file: file, line: line)
+    func newPromise<T>(of type: T.Type = T.self, file: StaticString = #file, line: UInt = #line) -> EventLoopPromise<T> {
+        makePromise(of: type, file: file, line: line)
     }
 
     @available(*, deprecated, renamed: "makeSucceededFuture(_:)")
-    public func newSucceededFuture<T>(result: T) -> EventLoopFuture<T> {
-        return self.makeSucceededFuture(result)
+    func newSucceededFuture<T>(result: T) -> EventLoopFuture<T> {
+        makeSucceededFuture(result)
     }
 
     @available(*, deprecated, renamed: "makeFailedFuture(_:)")
-    public func newFailedFuture<T>(error: Error) -> EventLoopFuture<T> {
-        return self.makeFailedFuture(error)
+    func newFailedFuture<T>(error: Error) -> EventLoopFuture<T> {
+        makeFailedFuture(error)
     }
 
     @available(*, deprecated, renamed: "scheduleRepeatedAsyncTask")
-    public func scheduleRepeatedTask(initialDelay: TimeAmount,
-                                     delay: TimeAmount,
-                                     notifying promise: EventLoopPromise<Void>? = nil,
-                                     _ task: @escaping (RepeatedTask) -> EventLoopFuture<Void>) -> RepeatedTask {
-        return self.scheduleRepeatedAsyncTask(initialDelay: initialDelay, delay: delay, task)
+    func scheduleRepeatedTask(initialDelay: TimeAmount,
+                              delay: TimeAmount,
+                              notifying _: EventLoopPromise<Void>? = nil,
+                              _ task: @escaping (RepeatedTask) -> EventLoopFuture<Void>) -> RepeatedTask
+    {
+        scheduleRepeatedAsyncTask(initialDelay: initialDelay, delay: delay, task)
     }
 }
 
-extension EventLoopFuture {
+public extension EventLoopFuture {
     @available(*, deprecated, renamed: "Value")
-    public typealias T = Value
+    typealias T = Value
 
     @available(*, deprecated, message: "whenComplete now gets Result<Value, Error>")
-    public func whenComplete(_ body: @escaping () -> Void) {
-        self.whenComplete { (_: Result) in
+    func whenComplete(_ body: @escaping () -> Void) {
+        whenComplete { (_: Result) in
             body()
         }
     }
 
     @available(*, deprecated, renamed: "flatMap")
-    public func then<U>(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Value) -> EventLoopFuture<U>) -> EventLoopFuture<U> {
-        return self.flatMap(file: file, line: line, callback)
+    func then<U>(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Value) -> EventLoopFuture<U>) -> EventLoopFuture<U> {
+        flatMap(file: file, line: line, callback)
     }
 
     @available(*, deprecated, renamed: "flatMapThrowing")
-    public func thenThrowing<U>(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Value) throws -> U) -> EventLoopFuture<U> {
-        return self.flatMapThrowing(file: file, line: line, callback)
+    func thenThrowing<U>(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Value) throws -> U) -> EventLoopFuture<U> {
+        flatMapThrowing(file: file, line: line, callback)
     }
 
     @available(*, deprecated, renamed: "flatMapError")
-    public func thenIfError(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Error) -> EventLoopFuture<Value>) -> EventLoopFuture<Value> {
-        return self.flatMapError(file: file, line: line, callback)
+    func thenIfError(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Error) -> EventLoopFuture<Value>) -> EventLoopFuture<Value> {
+        flatMapError(file: file, line: line, callback)
     }
 
     @available(*, deprecated, renamed: "flatMapErrorThrowing")
-    public func thenIfErrorThrowing(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Error) throws -> Value) -> EventLoopFuture<Value> {
-        return self.flatMapErrorThrowing(file: file, line: line, callback)
+    func thenIfErrorThrowing(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Error) throws -> Value) -> EventLoopFuture<Value> {
+        flatMapErrorThrowing(file: file, line: line, callback)
     }
 
     @available(*, deprecated, renamed: "recover")
-    public func mapIfError(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Error) -> Value) -> EventLoopFuture<Value> {
-        return self.recover(file: file, line: line, callback)
+    func mapIfError(file: StaticString = #file, line: UInt = #line, _ callback: @escaping (Error) -> Value) -> EventLoopFuture<Value> {
+        recover(file: file, line: line, callback)
     }
-  
+
     @available(*, deprecated, renamed: "and(value:file:line:)")
-    public func and<OtherValue>(result: OtherValue,
-                                file: StaticString = #file,
-                                line: UInt = #line) -> EventLoopFuture<(Value, OtherValue)> {
-        return self.and(value: result, file: file, line: line)
+    func and<OtherValue>(result: OtherValue,
+                         file: StaticString = #file,
+                         line: UInt = #line) -> EventLoopFuture<(Value, OtherValue)>
+    {
+        and(value: result, file: file, line: line)
     }
 
     @available(*, deprecated, renamed: "cascade(to:)")
-    public func cascade(promise: EventLoopPromise<Value>?) {
-        self.cascade(to: promise)
+    func cascade(promise: EventLoopPromise<Value>?) {
+        cascade(to: promise)
     }
 
     @available(*, deprecated, renamed: "cascadeFailure(to:)")
-    public func cascadeFailure<NewValue>(promise: EventLoopPromise<NewValue>?) {
-        self.cascadeFailure(to: promise)
+    func cascadeFailure<NewValue>(promise: EventLoopPromise<NewValue>?) {
+        cascadeFailure(to: promise)
     }
 
     @available(*, deprecated, renamed: "andAllSucceed(_:on:)")
-    public static func andAll(_ futures: [EventLoopFuture<Void>], eventLoop: EventLoop) -> EventLoopFuture<Void> {
-        return .andAllSucceed(futures, on: eventLoop)
+    static func andAll(_ futures: [EventLoopFuture<Void>], eventLoop: EventLoop) -> EventLoopFuture<Void> {
+        .andAllSucceed(futures, on: eventLoop)
     }
 
     @available(*, deprecated, renamed: "hop(to:)")
-    public func hopTo(eventLoop: EventLoop) -> EventLoopFuture<Value> {
-        return self.hop(to: eventLoop)
+    func hopTo(eventLoop: EventLoop) -> EventLoopFuture<Value> {
+        hop(to: eventLoop)
     }
 
     @available(*, deprecated, renamed: "reduce(_:_:on:_:)")
-    public static func reduce<InputValue>(_ initialResult: Value,
-                                          _ futures: [EventLoopFuture<InputValue>],
-                                          eventLoop: EventLoop,
-                                          _ nextPartialResult: @escaping (Value, InputValue) -> Value) -> EventLoopFuture<Value> {
-        return .reduce(initialResult, futures, on: eventLoop, nextPartialResult)
+    static func reduce<InputValue>(_ initialResult: Value,
+                                   _ futures: [EventLoopFuture<InputValue>],
+                                   eventLoop: EventLoop,
+                                   _ nextPartialResult: @escaping (Value, InputValue) -> Value) -> EventLoopFuture<Value>
+    {
+        .reduce(initialResult, futures, on: eventLoop, nextPartialResult)
     }
 
     @available(*, deprecated, renamed: "reduce(into:_:on:_:)")
-    public static func reduce<InputValue>(into initialResult: Value,
-                                          _ futures: [EventLoopFuture<InputValue>],
-                                          eventLoop: EventLoop,
-                                          _ updateAccumulatingResult: @escaping (inout Value, InputValue) -> Void) -> EventLoopFuture<Value> {
-        return .reduce(into: initialResult, futures, on: eventLoop, updateAccumulatingResult)
+    static func reduce<InputValue>(into initialResult: Value,
+                                   _ futures: [EventLoopFuture<InputValue>],
+                                   eventLoop: EventLoop,
+                                   _ updateAccumulatingResult: @escaping (inout Value, InputValue) -> Void) -> EventLoopFuture<Value>
+    {
+        .reduce(into: initialResult, futures, on: eventLoop, updateAccumulatingResult)
     }
 }
 
-extension EventLoopPromise {
+public extension EventLoopPromise {
     @available(*, deprecated, renamed: "succeed(_:)")
-    public func succeed(result: Value) {
-        self.succeed(result)
+    func succeed(result: Value) {
+        succeed(result)
     }
 
     @available(*, deprecated, renamed: "fail(_:)")
-    public func fail(error: Error) {
-        self.fail(error)
+    func fail(error: Error) {
+        fail(error)
     }
 }
 
-extension EventLoopGroup {
+public extension EventLoopGroup {
     @available(*, deprecated, message: "makeIterator is now required")
-    public func makeIterator() -> NIO.EventLoopIterator {
-        return .init([])
+    func makeIterator() -> NIO.EventLoopIterator {
+        .init([])
     }
 }
 
-extension MarkedCircularBuffer {
+public extension MarkedCircularBuffer {
     @available(*, deprecated, renamed: "Element")
-    public typealias E = Element
+    typealias E = Element
 
-    func _makeIndex(value: Int) -> Index {
-        return self.index(self.startIndex, offsetBy: value)
+    internal func _makeIndex(value: Int) -> Index {
+        index(startIndex, offsetBy: value)
     }
 
     @available(*, deprecated, renamed: "init(initialCapacity:)")
-    public init(initialRingCapacity: Int) {
+    init(initialRingCapacity: Int) {
         self = .init(initialCapacity: initialRingCapacity)
     }
 
     @available(*, deprecated, message: "please use MarkedCircularBuffer.Index instead of Int")
-    public func index(after i: Int) -> Int {
-        return i + 1
+    func index(after i: Int) -> Int {
+        i + 1
     }
 
     @available(*, deprecated, message: "please use MarkedCircularBuffer.Index instead of Int")
-    public func index(before: Int) -> Int {
-        return before - 1
+    func index(before: Int) -> Int {
+        before - 1
     }
 
     @available(*, deprecated, message: "please use MarkedCircularBuffer.Index instead of Int")
-    public func isMarked(index: Int) -> Bool {
-        return self.isMarked(index: self._makeIndex(value: index))
+    func isMarked(index: Int) -> Bool {
+        isMarked(index: _makeIndex(value: index))
     }
 
     @available(*, deprecated, message: "hasMark is now a property, remove `()`")
-    public func hasMark() -> Bool {
-        return self.hasMark
+    func hasMark() -> Bool {
+        hasMark
     }
 
     @available(*, deprecated, message: "markedElement is now a property, remove `()`")
-    public func markedElement() -> E? {
-        return self.markedElement
+    func markedElement() -> E? {
+        markedElement
     }
 
     @available(*, deprecated, message: "markedElementIndex is now a property, remove `()`")
-    public func markedElementIndex() -> Index? {
-        return self.markedElementIndex
+    func markedElementIndex() -> Index? {
+        markedElementIndex
     }
 }
 
-extension HTTPVersion {
+public extension HTTPVersion {
     @available(*, deprecated, message: "type of major and minor is now Int")
-    public init(major: UInt16, minor: UInt16) {
+    init(major: UInt16, minor: UInt16) {
         self = .init(major: Int(major), minor: Int(minor))
     }
 
     @available(*, deprecated, message: "type of major is now Int")
-    public var majorLegacy: UInt16 {
-        return UInt16(self.major)
+    var majorLegacy: UInt16 {
+        UInt16(major)
     }
 
     @available(*, deprecated, message: "type of minor is now Int")
-    public var minorLegacy: UInt16 {
-        return UInt16(self.minor)
+    var minorLegacy: UInt16 {
+        UInt16(minor)
     }
 }
 
-extension HTTPHeaders {
+public extension HTTPHeaders {
     @available(*, deprecated, message: "don't pass ByteBufferAllocator anymore")
-    public init(_ headers: [(String, String)] = [], allocator: ByteBufferAllocator) {
+    init(_ headers: [(String, String)] = [], allocator _: ByteBufferAllocator) {
         self.init(headers)
     }
 }
@@ -327,190 +331,188 @@ extension HTTPHeaders {
 public enum ChannelLifecycleError {
     @available(*, deprecated, message: "ChannelLifecycleError values are now available on ChannelError")
     public static var inappropriateOperationForState: ChannelError {
-        return ChannelError.inappropriateOperationForState
+        ChannelError.inappropriateOperationForState
     }
-
 }
 
 @available(*, deprecated, renamed: "ChannelError")
 public enum MulticastError {
     @available(*, deprecated, message: "MulticastError values are now available on ChannelError")
     public static var unknownLocalAddress: ChannelError {
-        return .unknownLocalAddress
+        .unknownLocalAddress
     }
 
     @available(*, deprecated, message: "MulticastError values are now available on ChannelError")
     public static var badMulticastGroupAddressFamily: ChannelError {
-        return .badMulticastGroupAddressFamily
+        .badMulticastGroupAddressFamily
     }
 
     @available(*, deprecated, message: "MulticastError values are now available on ChannelError")
     public static var badInterfaceAddressFamily: ChannelError {
-        return .badInterfaceAddressFamily
+        .badInterfaceAddressFamily
     }
 
     @available(*, deprecated, message: "MulticastError values are now available on ChannelError")
     public static func illegalMulticastAddress(_ address: SocketAddress) -> ChannelError {
-        return .illegalMulticastAddress(address)
+        .illegalMulticastAddress(address)
     }
 }
 
-extension ChannelError {
+public extension ChannelError {
     @available(*, deprecated, message: "ChannelError.connectFailed has been removed")
-    public static var connectFailed: NIOConnectionError {
+    static var connectFailed: NIOConnectionError {
         fatalError("ChannelError.connectFailed has been removed in NIO2")
     }
 }
 
-
-extension SocketAddress {
+public extension SocketAddress {
     @available(*, deprecated, message: "type of port is now Int?")
-    public var portLegacy: UInt16? {
-        return self.port.map(UInt16.init)
+    var portLegacy: UInt16? {
+        port.map(UInt16.init)
     }
 
     @available(*, deprecated, renamed: "makeAddressResolvingHost")
-    public static func newAddressResolving(host: String, port: Int) throws -> SocketAddress {
-        return try self.makeAddressResolvingHost(host, port: port)
+    static func newAddressResolving(host: String, port: Int) throws -> SocketAddress {
+        try makeAddressResolvingHost(host, port: port)
     }
 }
 
-extension CircularBuffer {
-    func _makeIndex(value: Int) -> Index {
-        return self.index(self.startIndex, offsetBy: value)
+public extension CircularBuffer {
+    internal func _makeIndex(value: Int) -> Index {
+        index(startIndex, offsetBy: value)
     }
 
     @available(*, deprecated, renamed: "Element")
-    public typealias E = Element
+    typealias E = Element
 
     @available(*, deprecated, renamed: "init(initialCapacity:)")
-    public init(initialRingCapacity: Int) {
+    init(initialRingCapacity: Int) {
         self = .init(initialCapacity: initialRingCapacity)
     }
 
     @available(*, deprecated, message: "please use CircularBuffer.Index instead of Int")
-    public subscript(index: Int) -> E {
-        return self[_makeIndex(value: index)]
+    subscript(index: Int) -> E {
+        self[_makeIndex(value: index)]
     }
 
     @available(*, deprecated, message: "please use CircularBuffer.Index instead of Int")
-    public func index(after: Int) -> Int {
-        return after + 1
+    func index(after: Int) -> Int {
+        after + 1
     }
 
     @available(*, deprecated, message: "please use CircularBuffer.Index instead of Int")
-    public func index(before: Int) -> Int {
-        return before - 1
+    func index(before: Int) -> Int {
+        before - 1
     }
 
     @available(*, deprecated, message: "please use CircularBuffer.Index instead of Int")
-    public mutating func removeSubrange(_ bounds: Range<Int>) {
-        return self.removeSubrange(_makeIndex(value: bounds.lowerBound) ..< _makeIndex(value: bounds.upperBound))
+    mutating func removeSubrange(_ bounds: Range<Int>) {
+        removeSubrange(_makeIndex(value: bounds.lowerBound) ..< _makeIndex(value: bounds.upperBound))
     }
 
     @available(*, deprecated, message: "please use CircularBuffer.Index instead of Int")
-    public mutating func remove(at position: Int) -> E {
-        return self.remove(at: _makeIndex(value: position))
+    mutating func remove(at position: Int) -> E {
+        remove(at: _makeIndex(value: position))
     }
 }
 
-extension ByteBuffer {
+public extension ByteBuffer {
     @available(*, deprecated, renamed: "writeStaticString(_:)")
-    public mutating func write(staticString: StaticString) -> Int {
-        return self.writeStaticString(staticString)
+    mutating func write(staticString: StaticString) -> Int {
+        writeStaticString(staticString)
     }
 
     @available(*, deprecated, renamed: "setStaticString(_:at:)")
-    public mutating func set(staticString: StaticString, at index: Int) -> Int {
-        return self.setStaticString(staticString, at: index)
+    mutating func set(staticString: StaticString, at index: Int) -> Int {
+        setStaticString(staticString, at: index)
     }
 
     @available(*, deprecated, renamed: "writeString(_:)")
-    public mutating func write(string: String) -> Int {
-        return self.writeString(string)
+    mutating func write(string: String) -> Int {
+        writeString(string)
     }
 
     @available(*, deprecated, renamed: "setString(_:at:)")
-    public mutating func set(string: String, at index: Int) -> Int {
-        return self.setString(string, at: index)
+    mutating func set(string: String, at index: Int) -> Int {
+        setString(string, at: index)
     }
 
     @available(*, deprecated, renamed: "writeDispatchData(_:)")
-    public mutating func write(dispatchData: DispatchData) -> Int {
-        return self.writeDispatchData(dispatchData)
+    mutating func write(dispatchData: DispatchData) -> Int {
+        writeDispatchData(dispatchData)
     }
 
     @available(*, deprecated, renamed: "setDispatchData(_:)")
-    public mutating func set(dispatchData: DispatchData, at index: Int) -> Int {
-        return self.setDispatchData(dispatchData, at: index)
+    mutating func set(dispatchData: DispatchData, at index: Int) -> Int {
+        setDispatchData(dispatchData, at: index)
     }
 
     @available(*, deprecated, renamed: "writeBuffer(_:)")
-    public mutating func write(buffer: inout ByteBuffer) -> Int {
-        return self.writeBuffer(&buffer)
+    mutating func write(buffer: inout ByteBuffer) -> Int {
+        writeBuffer(&buffer)
     }
 
     @available(*, deprecated, renamed: "writeBytes(_:)")
-    public mutating func write<Bytes: Sequence>(bytes: Bytes) -> Int where Bytes.Element == UInt8 {
-        return self.writeBytes(bytes)
+    mutating func write<Bytes: Sequence>(bytes: Bytes) -> Int where Bytes.Element == UInt8 {
+        writeBytes(bytes)
     }
 
     @available(*, deprecated, renamed: "writeBytes(_:)")
-    public mutating func write(bytes: UnsafeRawBufferPointer) -> Int {
-        return self.writeBytes(bytes)
+    mutating func write(bytes: UnsafeRawBufferPointer) -> Int {
+        writeBytes(bytes)
     }
 
     @available(*, deprecated, renamed: "setBytes(at:)")
-    public mutating func set<Bytes: Sequence>(bytes: Bytes, at index: Int) -> Int where Bytes.Element == UInt8 {
-        return self.setBytes(bytes, at: index)
+    mutating func set<Bytes: Sequence>(bytes: Bytes, at index: Int) -> Int where Bytes.Element == UInt8 {
+        setBytes(bytes, at: index)
     }
 
     @available(*, deprecated, renamed: "setBytes(at:)")
-    public mutating func set(bytes: UnsafeRawBufferPointer, at index: Int) -> Int {
-        return self.setBytes(bytes, at: index)
+    mutating func set(bytes: UnsafeRawBufferPointer, at index: Int) -> Int {
+        setBytes(bytes, at: index)
     }
 
     @available(*, deprecated, renamed: "writeInteger(_:endianness:as:)")
-    public mutating func write<T: FixedWidthInteger>(integer: T, endianness: Endianness = .big, as type: T.Type = T.self) -> Int {
-        return self.writeInteger(integer, endianness: endianness, as: type)
+    mutating func write<T: FixedWidthInteger>(integer: T, endianness: Endianness = .big, as type: T.Type = T.self) -> Int {
+        writeInteger(integer, endianness: endianness, as: type)
     }
 
     @available(*, deprecated, renamed: "setInteger(_:at:endianness:as:)")
-    public mutating func set<T: FixedWidthInteger>(integer: T, at index: Int, endianness: Endianness = .big, as type: T.Type = T.self) -> Int {
-        return self.setInteger(integer, at: index, endianness: endianness, as: type)
+    mutating func set<T: FixedWidthInteger>(integer: T, at index: Int, endianness: Endianness = .big, as type: T.Type = T.self) -> Int {
+        setInteger(integer, at: index, endianness: endianness, as: type)
     }
 
     @available(*, deprecated, renamed: "writeString(_:encoding:)")
-    public mutating func write(string: String, encoding: String.Encoding) throws -> Int {
-        return try self.writeString(string, encoding: encoding)
+    mutating func write(string: String, encoding: String.Encoding) throws -> Int {
+        try writeString(string, encoding: encoding)
     }
 
     @available(*, deprecated, renamed: "setString(_:encoding:at:)")
-    public mutating func set(string: String, encoding: String.Encoding, at index: Int) throws -> Int {
-        return try self.setString(string, encoding: encoding, at: index)
+    mutating func set(string: String, encoding: String.Encoding, at index: Int) throws -> Int {
+        try setString(string, encoding: encoding, at: index)
     }
 }
 
-extension Channel {
+public extension Channel {
     @available(*, deprecated, renamed: "_channelCore")
-    public var _unsafe: ChannelCore {
-        return self._channelCore
+    var _unsafe: ChannelCore {
+        _channelCore
     }
 
     @available(*, deprecated, renamed: "setOption(_:value:)")
-    public func setOption<Option: ChannelOption>(option: Option, value: Option.Value) -> EventLoopFuture<Void> {
-        return self.setOption(option, value: value)
+    func setOption<Option: ChannelOption>(option: Option, value: Option.Value) -> EventLoopFuture<Void> {
+        setOption(option, value: value)
     }
 
     @available(*, deprecated, renamed: "getOption(_:)")
-    public func getOption<Option: ChannelOption>(option: Option) -> EventLoopFuture<Option.Value> {
-        return self.getOption(option)
+    func getOption<Option: ChannelOption>(option: Option) -> EventLoopFuture<Option.Value> {
+        getOption(option)
     }
 }
 
-extension ChannelOption {
+public extension ChannelOption {
     @available(*, deprecated, renamed: "Value")
-    public typealias OptionType = Value
+    typealias OptionType = Value
 }
 
 @available(*, deprecated, renamed: "HTTPServerProtocolUpgrader")
@@ -525,9 +527,9 @@ public typealias HTTPUpgradeErrors = HTTPServerUpgradeErrors
 @available(*, deprecated, renamed: "NIOThreadPool")
 public typealias BlockingIOThreadPool = NIOThreadPool
 
-extension WebSocketFrameDecoder {
+public extension WebSocketFrameDecoder {
     @available(*, deprecated, message: "automaticErrorHandling deprecated, use WebSocketProtocolErrorHandler instead")
-    public convenience init(maxFrameSize: Int = 1 << 14, automaticErrorHandling: Bool) {
+    convenience init(maxFrameSize: Int = 1 << 14, automaticErrorHandling _: Bool) {
         self.init(maxFrameSize: maxFrameSize)
     }
 }
