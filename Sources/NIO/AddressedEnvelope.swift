@@ -21,24 +21,24 @@ public struct AddressedEnvelope<DataType> {
     public var remoteAddress: SocketAddress
     public var data: DataType
     /// Any metadata associated with this `AddressedEnvelope`
-    public var metadata: Metadata? = nil
+    public var metadata: Metadata?
 
     public init(remoteAddress: SocketAddress, data: DataType) {
         self.remoteAddress = remoteAddress
         self.data = data
     }
-    
+
     public init(remoteAddress: SocketAddress, data: DataType, metadata: Metadata?) {
         self.remoteAddress = remoteAddress
         self.data = data
         self.metadata = metadata
     }
-    
+
     /// Any metadata associated with an `AddressedEnvelope`
     public struct Metadata: Hashable {
         /// Details of any congestion state.
         public var ecnState: NIOExplicitCongestionNotificationState
-        
+
         public init(ecnState: NIOExplicitCongestionNotificationState) {
             self.ecnState = ecnState
         }
@@ -47,7 +47,7 @@ public struct AddressedEnvelope<DataType> {
 
 extension AddressedEnvelope: CustomStringConvertible {
     public var description: String {
-        return "AddressedEnvelope { remoteAddress: \(self.remoteAddress), data: \(self.data) }"
+        "AddressedEnvelope { remoteAddress: \(remoteAddress), data: \(data) }"
     }
 }
 
