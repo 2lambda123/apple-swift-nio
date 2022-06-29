@@ -29,7 +29,8 @@ var targets: [PackageDescription.Target] = [
                            "CNIOWindows",
                            "NIOConcurrencyHelpers",
                            "NIOCore",
-                           "_NIODataStructures"]),
+                           "_NIODataStructures",
+                           .product(name: "SystemPackage", package: "swift-system")]),
     .target(name: "NIO",
             dependencies: ["NIOCore",
                            "NIOEmbedded",
@@ -135,6 +136,14 @@ let package = Package(
         .library(name: "NIOTestUtils", targets: ["NIOTestUtils"]),
     ],
     dependencies: [
+        .package(
+            /// Using main with merged pull request apple/swift-system#82
+            ///
+            /// When a new version is released we should nail this back down.
+            url: "https://github.com/apple/swift-system",
+            // .upToNextMajor(from: "1.2.0")
+            .branch("main")
+        ),
     ],
     targets: targets
 )

@@ -14,6 +14,7 @@
 
 import NIOCore
 import NIOConcurrencyHelpers
+import SystemPackage
 
 /// `NonBlockingFileIO` is a helper that allows you to read files without blocking the calling thread.
 ///
@@ -318,25 +319,24 @@ public struct NonBlockingFileIO {
         return self.threadPool.runIfActive(eventLoop: eventLoop) { () -> ByteBuffer in
             var bytesRead = 0
             while bytesRead < byteCount {
-                let n = try buf.writeWithUnsafeMutableBytes(minimumWritableBytes: byteCount - bytesRead) { ptr in
-                    let res = try fileHandle.withUnsafeFileDescriptor { descriptor -> IOResult<ssize_t> in
-                        if let offset = fromOffset {
-                            return try Posix.pread(descriptor: descriptor,
-                                                   pointer: ptr.baseAddress!,
-                                                   size: byteCount - bytesRead,
-                                                   offset: off_t(offset) + off_t(bytesRead))
-                        } else {
-                            return try Posix.read(descriptor: descriptor,
-                                                  pointer: ptr.baseAddress!,
-                                                  size: byteCount - bytesRead)
+                let n = try buf.writeWithUnsafeMutableBytes(exactWritableBytes: byteCount - bytesRead) { ptr in
+                    try preservingNIOAPIErrors {
+                        let numBytesRead = try fileHandle.withUnsafeSystemFileDescriptor { descriptor -> Int in
+                            if let offset = fromOffset {
+                                return try descriptor.read(
+                                    fromAbsoluteOffset: offset + Int64(bytesRead),
+                                    into: ptr,
+                                    retryOnInterrupt: true
+                                )
+                            } else {
+                                return try descriptor.read(
+                                    into: ptr,
+                                    retryOnInterrupt: true
+                                )
+                            }
                         }
-                    }
-                    switch res {
-                    case .processed(let n):
-                        assert(n >= 0, "read claims to have read a negative number of bytes \(n)")
-                        return n
-                    case .wouldBlock:
-                        throw Error.descriptorSetToNonBlocking
+                        assert(numBytesRead >= 0, "read claims to have read a negative number of bytes \(numBytesRead)")
+                        return numBytesRead
                     }
                 }
                 if n == 0 {
@@ -364,8 +364,8 @@ public struct NonBlockingFileIO {
                                size: Int64,
                                eventLoop: EventLoop) -> EventLoopFuture<()> {
         return self.threadPool.runIfActive(eventLoop: eventLoop) {
-            try fileHandle.withUnsafeFileDescriptor { descriptor -> Void in
-                try Posix.ftruncate(descriptor: descriptor, size: off_t(size))
+            try fileHandle.withUnsafeSystemFileDescriptor { descriptor -> Void in
+                try descriptor.resize(to: size)
             }
         }
     }
@@ -379,11 +379,11 @@ public struct NonBlockingFileIO {
     public func readFileSize(fileHandle: NIOFileHandle,
                              eventLoop: EventLoop) -> EventLoopFuture<Int64> {
         return self.threadPool.runIfActive(eventLoop: eventLoop) {
-            return try fileHandle.withUnsafeFileDescriptor { descriptor in
-                let curr = try Posix.lseek(descriptor: descriptor, offset: 0, whence: SEEK_CUR)
-                let eof = try Posix.lseek(descriptor: descriptor, offset: 0, whence: SEEK_END)
-                try Posix.lseek(descriptor: descriptor, offset: curr, whence: SEEK_SET)
-                return Int64(eof)
+            return try fileHandle.withUnsafeSystemFileDescriptor { descriptor -> Int64 in
+                let curr = try descriptor.seek(offset: 0, from: .current)
+                let eof = try descriptor.seek(offset: 0, from: .end)
+                try descriptor.seek(offset: curr, from: .start)
+                return eof
             }
         }
     }
@@ -416,45 +416,44 @@ public struct NonBlockingFileIO {
         return self.write0(fileHandle: fileHandle, toOffset: toOffset, buffer: buffer, eventLoop: eventLoop)
     }
 
+    /// Converts `SystemPackage.Errno` to NIO API errors for backwards compatiblity.
+    ///
+    /// To preserve the existing NIO API, from before we adopted the Swift System APIs, we convert
+    /// the Swift System's `Errno` errors back to what what we threw before adopting Swift System.
+    ///
+    /// - throws: `NonBlockingFileIO.Error.descriptosSetToNonBlocking` if `operation` throws `SystemPackage.Errno.wouldBlock`
+    /// - throws: `IOError` if `operation` throws `SystemPackage.Errno` other than `.wouldBlock`.
+    /// - throws: If `operation` throws an error that is not `SystemPackage.Errno`, it is rethrown.
+    private func preservingNIOAPIErrors<T>(_ operation: () throws -> T) rethrows -> T {
+        do {
+            return try operation()
+        } catch let errno as SystemPackage.Errno {
+            switch errno {
+            case .wouldBlock:
+                throw Error.descriptorSetToNonBlocking
+            default:
+                throw IOError(errnoCode: errno.rawValue, reason: errno.description)
+            }
+        }
+    }
+
     private func write0(fileHandle: NIOFileHandle,
-                        toOffset: Int64?,
+                        toOffset offset: Int64?,
                         buffer: ByteBuffer,
                         eventLoop: EventLoop) -> EventLoopFuture<()> {
-        let byteCount = buffer.readableBytes
-
-        guard byteCount > 0 else {
+        guard buffer.readableBytes > 0 else {
             return eventLoop.makeSucceededFuture(())
         }
-
         return self.threadPool.runIfActive(eventLoop: eventLoop) {
-            var buf = buffer
-
-            var offsetAccumulator: Int = 0
-            repeat {
-                let n = try buf.readWithUnsafeReadableBytes { ptr in
-                    precondition(ptr.count == byteCount - offsetAccumulator)
-                    let res: IOResult<ssize_t> = try fileHandle.withUnsafeFileDescriptor { descriptor in
-                        if let toOffset = toOffset {
-                            return try Posix.pwrite(descriptor: descriptor,
-                                                    pointer: ptr.baseAddress!,
-                                                    size: byteCount - offsetAccumulator,
-                                                    offset: off_t(toOffset + Int64(offsetAccumulator)))
-                        } else {
-                            return try Posix.write(descriptor: descriptor,
-                                                   pointer: ptr.baseAddress!,
-                                                   size: byteCount - offsetAccumulator)
-                        }
-                    }
-                    switch res {
-                    case .processed(let n):
-                        assert(n >= 0, "write claims to have written a negative number of bytes \(n)")
-                        return n
-                    case .wouldBlock:
-                        throw Error.descriptorSetToNonBlocking
+            try preservingNIOAPIErrors {
+                _ = try fileHandle.withUnsafeSystemFileDescriptor { descriptor in
+                    if let offset = offset {
+                        try descriptor.writeAll(toAbsoluteOffset: offset, buffer.readableBytesView)
+                    } else {
+                        try descriptor.writeAll(buffer.readableBytesView)
                     }
                 }
-                offsetAccumulator += n
-            } while offsetAccumulator < byteCount
+            }
         }
     }
 
@@ -499,4 +498,12 @@ public struct NonBlockingFileIO {
         }
     }
 
+}
+
+extension NIOFileHandle {
+    public func withUnsafeSystemFileDescriptor<T>(_ body: (SystemPackage.FileDescriptor) throws -> T) throws -> T {
+        return try self.withUnsafeFileDescriptor { descriptor in
+            return try body(FileDescriptor(rawValue: descriptor))
+        }
+    }
 }
