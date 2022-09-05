@@ -121,6 +121,13 @@ var targets: [PackageDescription.Target] = [
                 dependencies: ["NIOCore", "NIOFoundationCompat"]),
     .testTarget(name: "NIOTests",
                 dependencies: ["NIO"]),
+    .plugin(name: "NIOSoundness",
+            capability: .command(
+                intent: .custom(
+                    verb: "check-nio-soundness",
+                    description: "Validates inputs files pass the NIO soundness check."
+                )
+            )),
 ]
 
 let package = Package(
@@ -138,6 +145,7 @@ let package = Package(
         .library(name: "NIOFoundationCompat", targets: ["NIOFoundationCompat"]),
         .library(name: "NIOWebSocket", targets: ["NIOWebSocket"]),
         .library(name: "NIOTestUtils", targets: ["NIOTestUtils"]),
+        .plugin(name: "nio-soundness", targets: ["NIOSoundness"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.0.2"),
