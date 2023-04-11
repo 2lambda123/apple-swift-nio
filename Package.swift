@@ -99,6 +99,8 @@ var targets: [PackageDescription.Target] = [
             dependencies: ["NIOPosix", "NIOCore", "NIOEmbedded", "NIOHTTP1", "NIOWebSocket", "NIOFoundationCompat"]),
     .executableTarget(name: "NIOAsyncAwaitDemo",
             dependencies: ["NIOPosix", "NIOCore", "NIOHTTP1"]),
+    .executableTarget(name: "NIOAsyncAwaitServerExample",
+            dependencies: ["NIOPosix", "NIOCore"]),
     .testTarget(name: "NIOCoreTests",
                 dependencies: ["NIOCore", "NIOEmbedded", "NIOFoundationCompat", swiftAtomics]),
     .testTarget(name: "NIOEmbeddedTests",
