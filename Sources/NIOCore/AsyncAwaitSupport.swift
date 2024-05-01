@@ -339,8 +339,12 @@ struct AsyncSequenceFromIterator<AsyncIterator: AsyncIteratorProtocol>: AsyncSeq
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension EventLoop {
     @inlinable
-    public func makeFutureWithTask<Return>(_ body: @Sendable @escaping () async throws -> Return) -> EventLoopFuture<Return> {
-        let promise = self.makePromise(of: Return.self)
+    public func makeFutureWithTask<Return>(
+        file: StaticString = #fileID,
+        line: UInt = #line,
+        _ body: @Sendable @escaping () async throws -> Return
+    ) -> EventLoopFuture<Return> {
+        let promise = self.makePromise(of: Return.self, file: file, line: line)
         promise.completeWithTask(body)
         return promise.futureResult
     }
